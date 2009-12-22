@@ -1,0 +1,7 @@
+  A tool to extract source code based on Haskell identifiers. For example,
+
+    HPath.Parser.parse
+
+  would extract all the source lines associated with the declaration `parse`
+  in the module `HPath.Parser`.
+
