@@ -19,13 +19,11 @@ extra-source-files            : README
 
 library
   build-depends               : base >= 2
-                              , scion >= 0.1.0.2
+                              , haskell-src-exts >= 1.3.5
                               , containers
                               , parsec
                               , utf8-string >= 0.3
-  exposed-modules             : HPath.Parser
-                                HPath.Hierarchy
-                                HPath.Path
+  exposed-modules             : HPath.Path
   extensions                  : StandaloneDeriving
                                 NoMonomorphismRestriction
 
@@ -33,7 +31,7 @@ library
 executable                      hpath
   main-is                     : Main.hs
   build-depends               : base >= 2
-                              , scion >= 0.1.0.2
+                              , haskell-src-exts >= 1.3.5
                               , containers
                               , parsec
                               , utf8-string >= 0.3
