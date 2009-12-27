@@ -99,3 +99,4 @@ instance MentionsNames Name where
   match (Symbol _ s) (Symbol _ s') = s == s'
   match _ _                  =  False
 
+
