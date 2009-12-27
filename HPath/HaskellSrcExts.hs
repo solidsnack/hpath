@@ -1,5 +1,5 @@
 
-module HPath.Search where
+module HPath.HaskellSrcExts where
 
 import Language.Haskell.Exts.Annotated
 import Data.List
