@@ -1,8 +1,9 @@
 
 module HPath.HaskellSrcExts.Classes where
 
-import Language.Haskell.Exts.Annotated
 import Data.List
+
+import Language.Haskell.Exts.Annotated
 
 
 
