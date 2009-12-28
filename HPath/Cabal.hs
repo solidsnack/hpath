@@ -14,7 +14,7 @@ import Language.Haskell.Extension
 
 
 {-| Open a Cabal file in the given directory and tell us what extensions are
-    in play and what the source directories are. 
+    in play and what the source directories are.
  -}
 info                        ::  FilePath -> IO ([Extension], [FilePath])
 info dir                     =  do
