@@ -2,15 +2,25 @@
 module HPath.HaskellSrcExts where
 
 import Data.List
-import Language.Haskell.Extension as Cabal
+import Data.Map (Map)
+import qualified Data.Map as Map
 
+import Language.Haskell.Extension as Cabal
 import Language.Haskell.Exts.Annotated
+import Language.Haskell.Exts.Annotated.ExactPrint
 import Language.Haskell.Exts.Extension as HaskellSrcExts
 
 import HPath.Path
+import HPath.Hierarchy
 import HPath.HaskellSrcExts.Classes
 
 
+
+
+search :: [Path] -> [Module SrcSpanInfo] -> Map Path [Decl SrcSpanInfo]
+search paths modules         =  Map.fromList
+  [ (p, concat [declarations mod q | mod <- modules])
+  | p <- paths, let q = qname p ]
 
 
 qname                       ::  Path -> QName SrcSpanInfo

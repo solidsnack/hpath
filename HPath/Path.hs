@@ -14,6 +14,8 @@ import HPath.Parser.Lower
 
 
 data Path                    =  Path [String] String String
+deriving instance Eq Path
+deriving instance Ord Path
 deriving instance Show Path
 
 
