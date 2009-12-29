@@ -23,7 +23,7 @@ info dir                     =  do
  where
   find                       =  one_cabal `fmap` getDirectoryContents dir
    where
-    one_cabal = listToMaybe . filter (isSuffixOf ".cabal")
+    one_cabal                =  listToMaybe . filter (isSuffixOf ".cabal")
 
 
 e_and_s :: GenericPackageDescription -> ([Extension], [FilePath])
