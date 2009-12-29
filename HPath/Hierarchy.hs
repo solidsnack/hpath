@@ -2,7 +2,6 @@
 module HPath.Hierarchy where
 
 import Data.List
-import System.FilePath
 
 import HPath.Path
 

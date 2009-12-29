@@ -6,10 +6,8 @@ import Data.List
 import Data.Map (Map)
 import qualified Data.Map as Map
 
-import System.IO.UTF8
 import Language.Haskell.Extension as Cabal
 import Language.Haskell.Exts.Annotated
-import Language.Haskell.Exts.Annotated.ExactPrint
 import Language.Haskell.Exts.Extension as HaskellSrcExts
 
 import HPath.Path
