@@ -49,9 +49,11 @@ modules paths exts           =  do
    where
     paired_exc               =  return . Left . ((,) f)
   read_mod f                 =  parseModuleWithMode (mode f) `fmap` readFile f
-  mode f                     =  ParseMode f exts False fixities
-  ParseMode _ _ _ fixities   =  defaultParseMode
+  mode f                     =  ParseMode f exts False True fixities
+  ParseMode _ _ _ _ fixities = defaultParseMode
   partition                  =  foldr part ([], [])
    where
     part (ParseOk t) (ok, err) = (t:ok, err)
     part (ParseFailed loc s) (ok, err) = (ok, (loc, s):err)
+
+

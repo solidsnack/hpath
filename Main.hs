@@ -54,7 +54,7 @@ main                         =  do
         when ((not . null) parse_errors)
              (err "Parse errors:" >> mapM_ (err . show) parse_errors)
         when ((not . null) io_exceptions)
-             (err "File I/O errors:" >> mapM_ (err . show) io_exceptions)
+             (err "Varied exceptions:" >> mapM_ (err . show) io_exceptions)
         if null mods
           then  err "No files corresponding to this identifier." >> err usage'
           else  do
