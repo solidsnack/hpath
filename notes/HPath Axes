@@ -1,0 +1,52 @@
+
+  At first, there was only one axis -- identifiers. However, there are
+  legitimately several things to search for:
+
+ .  Type/Data/NewType declarations.
+
+ .  Function declarations.
+
+ .  Constructor declarations.
+
+ .  Class declarations.
+
+ .  Instance declarations for a certain type.
+
+ .  Instances for a given class.
+
+  Ignoring the constructors might be a good idea. Say we do. Then
+  values/functions are syntactically distinct from classes/datatypes. Only
+  classes and types have instances. Then we have:
+
+    hpath://HPath.Path.Path
+    hpath://HPath.Path.Path/instances
+
+  and the same for any classes. Note that finding instance texts means we need
+  to have all the code parsed and available to capture orphans.
+
+  We probably also want a way to select instances, like:
+
+    hpath://HPath.Path.Path/Show,Eq,Ord
+
+  These shouldn't have to be qualified. Then it's okay to shorten the previous
+  example to:
+
+    hpath://HPath.Path.Path/*
+
+  In practice, shells will not expand the final star.
+
+  Class and datatype instance lookup can use the same syntax:
+
+    hpath://HPath.HaskellSrcExts.Classes.SearchModule/*
+
+  Summary of thoughts:
+
+ .  HPath looks up function/value definitions, class definitions and datatype
+    definitions. It does not lookup constructor definitions.
+
+ .  HPath allows lookup of instances for classes and datatypes.
+
+  Although looking up "relevant instances" for a type actually is a very, very
+  hard problem; so maybe not...
+
+
