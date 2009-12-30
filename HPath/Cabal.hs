@@ -24,16 +24,14 @@ info dir                     =  do
   find                       =  one_cabal `fmap` getDirectoryContents dir
    where
     one_cabal                =  listToMaybe . filter (isSuffixOf ".cabal")
-
-
-e_and_s :: GenericPackageDescription -> ([Extension], [FilePath])
-e_and_s gpkg                 =  concatP joined
- where
-  joined                     =  maybeToList lib ++ exes ++ [([], ["."])]
-  pkg                        =  packageDescription gpkg
-  exes                       =  (build_read . buildInfo) `fmap` executables pkg
-  lib                        =  (build_read . libBuildInfo) `fmap` library pkg
-  build_read bi              =  (extensions bi, hsSourceDirs bi)
-  concatP pairs              =  (concatMap fst pairs, concatMap snd pairs)
+  e_and_s :: GenericPackageDescription -> ([Extension], [FilePath])
+  e_and_s gpkg               =  concatP joined
+   where
+    joined                   =  maybeToList lib ++ exes ++ [([], [dir])]
+    pkg                      =  packageDescription gpkg
+    exes                     =  (build_read . buildInfo) `fmap` executables pkg
+    lib                      =  (build_read . libBuildInfo) `fmap` library pkg
+    build_read bi            =  (extensions bi, hsSourceDirs bi)
+    concatP pairs            =  (concatMap fst pairs, concatMap snd pairs)
 
 
