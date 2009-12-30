@@ -30,7 +30,8 @@ q                           ::  CharParser st Path
 q                            =  do
   modules                   <-  sepEndBy1 modid (char '.')
   name                      <-  choice [varid, varsym, conid, consym]
-  return (Path (tail modules) (head modules) name)
+  let (mods, [mod])            =  splitAt (length modules - 1) modules
+  return (Path mods mod name)
 
 
 url                         ::  Path -> String

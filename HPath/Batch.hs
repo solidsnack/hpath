@@ -2,10 +2,10 @@
 module HPath.Batch where
 
 import System.FilePath
-import Prelude hiding (readFile, putStrLn)
+import Prelude hiding (init, readFile, putStrLn)
 import System.IO.UTF8
 import Data.Maybe
-import Data.List
+import Data.List hiding (init)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
@@ -25,6 +25,15 @@ import qualified HPath.Cabal as Cabal
 
 
 
+batch paths dir              =  runStateT op (Map.empty, Map.empty)
+ where
+  op                         =  do
+    init dir paths
+    (fmap (uncurry report) . Map.assocs) `fmap` search
+   where
+    report path decls        =  (path, fmap (`exactPrint` []) decls)
+
+
 init
  :: FilePath
  -> [Path]
@@ -38,15 +47,13 @@ init dir paths               =  do
   put (with_files, map)
 
 
-search_and_report
- :: StateT (Map Path [FilePath], Map FilePath (Module SrcSpanInfo)) IO ()
-search_and_report            =  do
+search :: StateT (Map Path [FilePath], Map FilePath (Module SrcSpanInfo))
+                 IO (Map Path [Decl SrcSpanInfo])
+search                       =  do
   (path_map, module_map)    <-  get
   let collapsed              =  map_collapse module_map path_map
       searched               =  Map.mapWithKey HaskellSrcExts.search collapsed
-  liftIO (uncurry report `mapM_` Map.assocs searched)
- where
-  report path decls = mapM_ putStrLn (url path : fmap (`exactPrint` []) decls)
+  return searched
 
 
 search_out :: Map Path [Module SrcSpanInfo] -> Map Path [Decl SrcSpanInfo]

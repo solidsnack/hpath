@@ -14,7 +14,7 @@ import HPath.Path
 
 
 
-usage name =
+usage name                   =  unlines
  [ "USAGE:   " ++ name ++ " <Haskell identifiers>"
  , ""
  , "  Print the source text corresponding to the Haskell identifiers."
@@ -25,15 +25,24 @@ usage name =
 
 main                         =  do
   args                      <-  getArgs
-  paths                     <-  catMaybes `fmap` mapM parse_one args
-  print paths
- where
-  parse_one arg              =  case parse arg of
-      Right path            ->  return (Just path)
+  name                      <-  getProgName
+  case args of
+    ["-h"]                  ->  out (usage name)
+    ["-?"]                  ->  out (usage name)
+    ["--help"]              ->  out (usage name)
+    [arg]                   ->  case parse arg of
       Left e                ->  do
         err ("Not a path: " ++ arg ++ "\n" ++ show e)
-        return Nothing
+        err (usage name)
+      Right path            ->  do
+        dir                 <-  getCurrentDirectory
+        (_, texts):_        <-  fst `fmap` batch [path] dir
+        mapM_ out texts
 
 
 err s                        =  hPutStrLn stderr s
+
+
+out s                        =  hPutStrLn stdout s
+
 
