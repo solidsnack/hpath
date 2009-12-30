@@ -23,15 +23,23 @@ deriving instance Show Path
 
 
 parse                       ::  String -> Either ParseError Path
-parse s                      =  Text.ParserCombinators.Parsec.parse q s s
+parse s = Text.ParserCombinators.Parsec.parse (qualified []) s s
 
 
-q                           ::  CharParser st Path
-q                            =  do
-  modules                   <-  sepEndBy1 modid (char '.')
-  name                      <-  choice [varid, varsym, conid, consym]
-  let (mods, [mod])            =  splitAt (length modules - 1) modules
-  return (Path mods mod name)
+qualified []                =  modules []
+qualified (mod:mods)        =  do
+  choice
+    [ try (modules (mod:mods))
+    , do
+        name                <-  choice [varid, varsym, conid, consym]
+        return (Path (reverse mods) mod name)
+    ]
+
+
+modules mods                 =  do
+  mod                       <-  modid
+  char '.'
+  qualified (mod:mods)
 
 
 url                         ::  Path -> String
