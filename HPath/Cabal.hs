@@ -1,8 +1,13 @@
 
 module HPath.Cabal where
 
+import Prelude hiding (readFile, putStrLn)
+import System.IO (stderr, stdin, stdout)
+import System.IO.UTF8
+import System.FilePath
 import Data.List
 import Data.Maybe
+import Control.Monad
 import System.Directory
 
 import Distribution.Verbosity
@@ -19,7 +24,18 @@ import Language.Haskell.Extension
 info                        ::  FilePath -> IO ([Extension], [FilePath])
 info dir                     =  do
   cabal                     <-  find
-  maybe (return ([], [])) (fmap e_and_s . readPackageDescription normal) cabal
+  case cabal of
+    Nothing                 ->  return ([], [])
+    Just file               ->  do
+      s                     <-  readFile file
+      case parsePackageDescription s of
+        ParseFailed err     ->  do
+          hPutStrLn stderr ("Cabal error:" ++ "\n" ++ show err)
+          return ([], [])
+        ParseOk warns gpkg  ->  do
+          when ((not . null) warns) $ do
+            hPutStrLn stderr (unlines ("Cabal warnings:" : fmap show warns))
+          return (e_and_s gpkg)
  where
   find                       =  one_cabal `fmap` getDirectoryContents dir
    where

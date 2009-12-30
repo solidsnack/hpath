@@ -5,7 +5,6 @@ import System.Directory
 import System.FilePath
 import Data.List
 import Data.Either
-import Data.Maybe
 import Control.Monad
 
 import System.Environment.UTF8
@@ -47,6 +46,8 @@ main                         =  do
         (exts, roots)       <-  Cabal.info dir
         let files            =  nub [ r </> p | p <- paths path, r <- roots ]
             converted        =  nub (HaskellSrcExts.extension_conversion exts)
+        when ((not . null) converted)
+             (err (unlines ("Extensions:" : fmap show converted)))
         (mods, errs)        <-  HaskellSrcExts.modules files converted
         let parse_errors     =  fst errs
             io_exceptions    =  snd errs
