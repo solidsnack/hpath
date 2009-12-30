@@ -2,6 +2,9 @@
 module HPath.Batch where
 
 import System.FilePath
+import Prelude hiding (readFile, putStrLn)
+import System.IO.UTF8
+import Data.Maybe
 import Data.List
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -22,14 +25,39 @@ import qualified HPath.Cabal as Cabal
 
 
 
-init :: FilePath -> [Path] -> StateT (Map FilePath (Module SrcSpanInfo)) IO ()
+init
+ :: FilePath
+ -> [Path]
+ -> StateT (Map Path [FilePath], Map FilePath (Module SrcSpanInfo)) IO ()
 init dir paths               =  do
   (exts, roots)             <-  liftIO (Cabal.info dir)
   let with_files             =  path_map paths roots
       files                  =  (Set.fromList . concat . Map.elems) with_files
       converted              =  HaskellSrcExts.extension_conversion exts
   (map, errors)             <-  liftIO (modules files (Set.fromList converted))
-  put map
+  put (with_files, map)
+
+
+search_and_report
+ :: StateT (Map Path [FilePath], Map FilePath (Module SrcSpanInfo)) IO ()
+search_and_report            =  do
+  (path_map, module_map)    <-  get
+  let collapsed              =  map_collapse module_map path_map
+      searched               =  Map.mapWithKey HaskellSrcExts.search collapsed
+  liftIO (uncurry report `mapM_` Map.assocs searched)
+ where
+  report path decls = mapM_ putStrLn (url path : fmap (`exactPrint` []) decls)
+
+
+search_out :: Map Path [Module SrcSpanInfo] -> Map Path [Decl SrcSpanInfo]
+search_out map               =  Map.mapWithKey HaskellSrcExts.search map
+
+
+map_collapse
+ :: Map FilePath (Module SrcSpanInfo)
+ -> Map Path [FilePath]
+ -> Map Path [Module SrcSpanInfo]
+map_collapse map             =  Map.map (catMaybes . fmap (`Map.lookup` map))
 
 
 path_map                    ::  [Path] -> [FilePath] -> Map Path [FilePath]

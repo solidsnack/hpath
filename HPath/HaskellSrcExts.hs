@@ -1,10 +1,7 @@
 
 module HPath.HaskellSrcExts where
 
-import Prelude hiding (readFile)
 import Data.List
-import Data.Map (Map)
-import qualified Data.Map as Map
 
 import Language.Haskell.Extension as Cabal
 import Language.Haskell.Exts.Annotated
@@ -16,22 +13,18 @@ import HPath.HaskellSrcExts.Classes
 
 
 
-search :: [Path] -> [Module SrcSpanInfo] -> Map Path [Decl SrcSpanInfo]
-search paths modules         =  Map.fromList
-  [ (p, concat [declarations mod q | mod <- modules])
-  | p <- paths, let q = qname p ]
+search :: Path -> [Module SrcSpanInfo] -> [Decl SrcSpanInfo]
+search path modules          =  concatMap (`declarations` qname path) modules
 
 
 qname                       ::  Path -> QName SrcSpanInfo
-qname (Path u m name)        =  Qual note (ModuleName note mod) name'
+qname p@(Path u m name)      =  Qual note (ModuleName note mod) name'
  where
   name'                      =  case name of
     '(':_                   ->  Symbol note name
     _                       ->  Ident note name
   mod                        =  intercalate "." (u ++ [m])
-  note                       =  SrcSpanInfo (SrcSpan url 0 0 0 0) []
-   where
-    url                      =  "hpath://" ++ mod ++ ('.':name)
+  note                       =  SrcSpanInfo (SrcSpan (url p) 0 0 0 0) []
 
 
 extension_conversion        ::  [Cabal.Extension] -> [HaskellSrcExts.Extension]

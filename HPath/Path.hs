@@ -2,7 +2,10 @@
 module HPath.Path
   ( Path(..)
   , parse
+  , url
   ) where
+
+import Data.List
 
 import qualified Text.ParserCombinators.Parsec (parse)
 import Text.ParserCombinators.Parsec hiding (parse)
@@ -29,5 +32,8 @@ q                            =  do
   name                      <-  choice [varid, varsym, conid, consym]
   return (Path (tail modules) (head modules) name)
 
+
+url                         ::  Path -> String
+url (Path h m d)             =  "hpath://" ++ intercalate "." (h ++ [m, d])
 
 
