@@ -35,19 +35,19 @@ info dir                     =  do
         ParseOk warns gpkg  ->  do
           when ((not . null) warns) $ do
             hPutStrLn stderr (unlines ("Cabal warnings:" : fmap show warns))
-          return (e_and_s gpkg)
+          return (extensions_and_sources gpkg)
  where
   find                       =  one_cabal `fmap` getDirectoryContents dir
    where
     one_cabal                =  listToMaybe . filter (isSuffixOf ".cabal")
-  e_and_s :: GenericPackageDescription -> ([Extension], [FilePath])
-  e_and_s gpkg               =  concatP joined
+  extensions_and_sources gpkg = concatP joined
    where
-    joined                   =  maybeToList lib ++ exes ++ [([], [dir])]
-    pkg                      =  packageDescription gpkg
-    exes                     =  (build_read . buildInfo) `fmap` executables pkg
-    lib                      =  (build_read . libBuildInfo) `fmap` library pkg
-    build_read bi            =  (extensions bi, hsSourceDirs bi)
+    joined                   =  [lib] ++ exes ++ [([], [dir])]
+    exes                     =  exe `fmap` condExecutables gpkg
+    exe                      =  build_read . buildInfo . condTreeData . snd
+    lib                      =  case condLibrary gpkg of
+      Nothing               ->  ([], [])
+      Just condTree -> (build_read . libBuildInfo . condTreeData) condTree
     concatP pairs            =  (concatMap fst pairs, concatMap snd pairs)
-
+    build_read bi            =  (extensions bi, hsSourceDirs bi)
 
