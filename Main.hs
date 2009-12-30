@@ -52,14 +52,14 @@ main                         =  do
         let parse_errors     =  fst errs
             io_exceptions    =  snd errs
         when ((not . null) parse_errors)
-             (err "Parse errors:" >> mapM_ print parse_errors)
+             (err "Parse errors:" >> mapM_ (err . show) parse_errors)
         when ((not . null) io_exceptions)
-             (err "File I/O errors:" >> mapM_ print io_exceptions)
+             (err "File I/O errors:" >> mapM_ (err . show) io_exceptions)
         if null mods
           then  err "No files corresponding to this identifier." >> err usage'
           else  do
             let decls        =  HaskellSrcExts.search path (take 1 mods)
-            mapM_ (out . (`exactPrint` [])) decls
+            mapM_ (out . exactPrint') decls
     _                       ->  err usage'
 
 
@@ -67,5 +67,12 @@ err s                        =  hPutStrLn stderr s
 
 
 out s                        =  hPutStrLn stdout s
+
+
+{-| We wrap 'exactPrint' to get rid of the many newlines it normally places in 
+    front of the declaration (it positions the output on the same line as it
+    would have been on in the input).
+ -}
+exactPrint' ep               =  dropWhile (=='\n') (exactPrint ep [])
 
 
